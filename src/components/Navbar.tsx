@@ -1,10 +1,17 @@
 "use client";
 
 import { useAppStore } from "@/lib/store";
-import { Activity, Shield, User } from "lucide-react";
+import { Activity, Shield, User, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function Navbar() {
-  const { userRole, toggleRole } = useAppStore();
+  const { userRole, logout } = useAppStore();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.replace("/");
+  };
 
   return (
     <nav className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm">
@@ -19,30 +26,24 @@ export function Navbar() {
       </div>
 
       <div className="flex items-center space-x-4">
-        {/* Role Toggle for Prototype */}
-        <div className="flex items-center bg-slate-100 rounded-full p-1 border border-slate-200">
+        <div className="flex items-center bg-slate-100 rounded-full py-1.5 px-4 border border-slate-200 md:min-w-48 justify-between">
+          
+          <div className="flex items-center space-x-2 text-sm font-bold text-slate-700">
+            {userRole === 'editor' ? (
+              <><Shield className="h-4 w-4 text-blue-600" /> <span className="text-blue-700">Chief Resident</span></>
+            ) : (
+              <><User className="h-4 w-4 text-slate-500" /> <span>Staff (Viewer)</span></>
+            )}
+          </div>
+
           <button
-            onClick={() => userRole !== 'editor' && toggleRole()}
-            className={`flex items-center space-x-2 px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              userRole === 'editor' 
-                ? 'bg-white shadow-sm text-blue-700' 
-                : 'text-slate-500 hover:text-slate-700'
-            }`}
+            onClick={handleLogout}
+            className="ml-4 text-slate-400 hover:text-red-500 transition-colors"
+            title="Log Out"
           >
-            <Shield className="h-4 w-4" />
-            <span>Chief (Editor)</span>
+            <LogOut className="h-4 w-4" />
           </button>
-          <button
-            onClick={() => userRole !== 'viewer' && toggleRole()}
-            className={`flex items-center space-x-2 px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              userRole === 'viewer' 
-                ? 'bg-white shadow-sm text-slate-800' 
-                : 'text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            <User className="h-4 w-4" />
-            <span>Staff (View)</span>
-          </button>
+          
         </div>
       </div>
     </nav>

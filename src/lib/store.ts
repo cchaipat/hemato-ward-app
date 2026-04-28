@@ -1,12 +1,14 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { Patient, Bed, PatientStatus, UserRole } from './types';
 import { mockBeds, mockPatients } from './mockData';
 import { calculatePriorityScore } from './utils';
 
 interface AppState {
   // Auth/Role
-  userRole: UserRole;
-  toggleRole: () => void;
+  userRole: UserRole | null;
+  login: (role: UserRole) => void;
+  logout: () => void;
 
   // Data
   patients: Patient[];
@@ -18,9 +20,12 @@ interface AppState {
   addPatient: (patientData: Omit<Patient, "id" | "status" | "priorityScore">) => void;
 }
 
-export const useAppStore = create<AppState>((set, get) => ({
-  userRole: 'editor',
-  toggleRole: () => set((state) => ({ userRole: state.userRole === 'editor' ? 'viewer' : 'editor' })),
+export const useAppStore = create<AppState>()(
+  persist(
+    (set, get) => ({
+      userRole: null,
+      login: (role) => set({ userRole: role }),
+      logout: () => set({ userRole: null }),
 
   patients: mockPatients,
   // Ensure beds are initially occupied if mock data assigns a patient to a bed
@@ -108,4 +113,10 @@ export const useAppStore = create<AppState>((set, get) => ({
       };
     });
   }
-}));
+    }),
+    {
+      name: 'hemato-app-storage',
+      partialize: (state) => ({ userRole: state.userRole }), // Only persist auth state, keep mock data fresh
+    }
+  )
+);
