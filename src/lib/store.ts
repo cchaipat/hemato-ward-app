@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { Patient, Bed, PatientStatus, UserRole } from './types';
 import { mockBeds, mockPatients } from './mockData';
+import { calculatePriorityScore } from './utils';
 
 interface AppState {
   // Auth/Role
@@ -14,6 +15,7 @@ interface AppState {
   // Actions
   movePatient: (patientId: string, newStatus: PatientStatus, newBedId?: string | null) => void;
   updateBedOccupancy: () => void;
+  addPatient: (patientData: Omit<Patient, "id" | "status" | "priorityScore">) => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -84,6 +86,26 @@ export const useAppStore = create<AppState>((set, get) => ({
         };
       });
       return { ...state, beds: updatedBeds };
+    });
+  },
+
+  addPatient: (patientData) => {
+    set((state) => {
+      // Inline import to avoid circular dep if we needed utils here, but calculatePriorityScore is better to just be called after importing
+      // Wait, we need calculatePriorityScore. I will let utils handle it.
+      const newId = `p-${Date.now()}`;
+      
+      const newPatient: Patient = {
+        ...patientData,
+        id: newId,
+        status: 'waitlist',
+        priorityScore: calculatePriorityScore(patientData.clinicalIndications, patientData.isUrgent), 
+      };
+
+      return {
+        ...state,
+        patients: [...state.patients, newPatient]
+      };
     });
   }
 }));

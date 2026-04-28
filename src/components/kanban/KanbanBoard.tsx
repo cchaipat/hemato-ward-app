@@ -6,6 +6,8 @@ import { useAppStore } from "@/lib/store";
 import { PatientStatus, Bed } from "@/lib/types";
 import { PatientCard } from "./PatientCard";
 import { BedAssignmentModal } from "./BedAssignmentModal";
+import { AddPatientModal } from "./AddPatientModal";
+import { Plus } from "lucide-react";
 
 const COLUMNS: { id: PatientStatus; title: string; color: string }[] = [
   { id: 'waitlist', title: 'Waitlist', color: 'bg-slate-50 border-slate-200' },
@@ -20,6 +22,7 @@ export function KanbanBoard() {
   
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
   const [pendingMove, setPendingMove] = useState<{ patientId: string; destinationStatus: PatientStatus } | null>(null);
 
   useEffect(() => {
@@ -78,9 +81,16 @@ export function KanbanBoard() {
               <div key={column.id} className="flex flex-col h-full">
                 <div className="flex items-center justify-between mb-3 px-1">
                   <h2 className="font-semibold text-slate-700">{column.title}</h2>
-                  <span className="bg-slate-200 text-slate-600 text-xs font-bold px-2 py-0.5 rounded-full">
-                    {columnPatients.length}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {column.id === 'waitlist' && (
+                      <button onClick={() => setAddModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white p-1 rounded-md transition-colors" title="Add Patient">
+                        <Plus className="h-4 w-4" />
+                      </button>
+                    )}
+                    <span className="bg-slate-200 text-slate-600 text-xs font-bold px-2 py-0.5 rounded-full">
+                      {columnPatients.length}
+                    </span>
+                  </div>
                 </div>
                 
                 <Droppable droppableId={column.id}>
@@ -117,6 +127,10 @@ export function KanbanBoard() {
             setPendingMove(null);
           }} 
         />
+      )}
+
+      {addModalOpen && (
+        <AddPatientModal onClose={() => setAddModalOpen(false)} />
       )}
     </>
   );
