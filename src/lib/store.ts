@@ -106,6 +106,7 @@ export const useAppStore = create<AppState>()(
         id: newId,
         status: 'waitlist',
         priorityScore: calculatePriorityScore(patientData.clinicalIndications, patientData.isUrgent), 
+        addedAt: new Date().toISOString(),
       };
 
       return {

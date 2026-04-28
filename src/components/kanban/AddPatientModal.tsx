@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { ClinicalIndication, Patient } from "@/lib/types";
 import { PRIORITY_RANKING } from "@/lib/utils";
+import { TITLES, DIAGNOSES, REGIMENS } from "@/lib/constants";
 
 interface AddPatientModalProps {
   onClose: () => void;
@@ -14,16 +15,21 @@ export function AddPatientModal({ onClose }: AddPatientModalProps) {
   const { addPatient } = useAppStore();
 
   const [formData, setFormData] = useState({
+    patientTitle: TITLES[0],
+    customTitle: "",
     name: "",
     hn: "",
     sex: "Male" as "Male" | "Female",
-    diagnosis: "",
-    regimen: "",
+    diagnosis: DIAGNOSES[0],
+    customDiagnosis: "",
+    regimen: REGIMENS[0],
+    customRegimen: "",
     isInduction: false,
     cycle: 1,
     expectedCmtDate: "",
-    treatmentIntention: "Curative" as "Curative" | "Palliative" | "Other",
+    treatmentIntention: "1 - Curative" as "0 - Exact date" | "1 - Curative" | "2 - Palliative",
     clinician: "",
+    remark: "",
     clinicalIndication: "Other" as ClinicalIndication,
     isUrgent: false,
   });
@@ -37,16 +43,18 @@ export function AddPatientModal({ onClose }: AddPatientModalProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addPatient({
+      patientTitle: formData.patientTitle === "อื่นๆ" ? formData.customTitle : formData.patientTitle,
       name: formData.name,
       hn: formData.hn,
       sex: formData.sex,
-      diagnosis: formData.diagnosis,
-      regimen: formData.regimen,
+      diagnosis: formData.diagnosis === "อื่นๆ" ? formData.customDiagnosis : formData.diagnosis,
+      regimen: formData.regimen === "อื่นๆ" ? formData.customRegimen : formData.regimen,
       isInduction: formData.isInduction,
       cycle: Number(formData.cycle),
       expectedCmtDate: formData.expectedCmtDate,
       treatmentIntention: formData.treatmentIntention,
       clinician: formData.clinician,
+      remark: formData.remark,
       clinicalIndications: [formData.clinicalIndication],
       isUrgent: formData.isUrgent,
       assignedBedId: null
@@ -67,6 +75,17 @@ export function AddPatientModal({ onClose }: AddPatientModalProps) {
 
         <form onSubmit={handleSubmit} className="p-5 max-h-[75vh] overflow-y-auto space-y-4">
           <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2 md:col-span-1">
+              <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
+              <div className="flex gap-2">
+                <select name="patientTitle" value={formData.patientTitle} onChange={handleChange} className="w-1/3 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  {TITLES.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+                {formData.patientTitle === "อื่นๆ" && (
+                  <input required name="customTitle" value={formData.customTitle} onChange={handleChange} className="w-2/3 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Specify title" />
+                )}
+              </div>
+            </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
               <input required name="name" value={formData.name} onChange={handleChange} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g. Somchai" />
@@ -83,7 +102,7 @@ export function AddPatientModal({ onClose }: AddPatientModalProps) {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Primary Clinician</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Primary Clinician (ผู้ขอ)</label>
               <input required name="clinician" value={formData.clinician} onChange={handleChange} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Dr. XYZ" />
             </div>
           </div>
@@ -93,7 +112,12 @@ export function AddPatientModal({ onClose }: AddPatientModalProps) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Diagnosis</label>
-              <input required name="diagnosis" value={formData.diagnosis} onChange={handleChange} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <select name="diagnosis" value={formData.diagnosis} onChange={handleChange} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                {DIAGNOSES.map(d => <option key={d} value={d}>{d}</option>)}
+              </select>
+              {formData.diagnosis === "อื่นๆ" && (
+                <input required name="customDiagnosis" value={formData.customDiagnosis} onChange={handleChange} className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Specify diagnosis" />
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Primary Indication (Priority rules)</label>
@@ -103,9 +127,14 @@ export function AddPatientModal({ onClose }: AddPatientModalProps) {
                 ))}
               </select>
             </div>
-            <div>
+            <div className="col-span-2">
               <label className="block text-sm font-medium text-slate-700 mb-1">CMT Regimen</label>
-              <input required name="regimen" value={formData.regimen} onChange={handleChange} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g. R-CHOP" />
+              <select name="regimen" value={formData.regimen} onChange={handleChange} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                {REGIMENS.map(r => <option key={r} value={r}>{r}</option>)}
+              </select>
+              {formData.regimen === "อื่นๆ" && (
+                <input required name="customRegimen" value={formData.customRegimen} onChange={handleChange} className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Specify regimen" />
+              )}
             </div>
             <div className="flex gap-4">
               <div className="flex-1">
@@ -118,12 +147,16 @@ export function AddPatientModal({ onClose }: AddPatientModalProps) {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Treatment Intention</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Rx Intention</label>
               <select name="treatmentIntention" value={formData.treatmentIntention} onChange={handleChange} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="Curative">Curative</option>
-                <option value="Palliative">Palliative</option>
-                <option value="Other">Other</option>
+                <option value="0 - Exact date">0 - Exact date</option>
+                <option value="1 - Curative">1 - Curative</option>
+                <option value="2 - Palliative">2 - Palliative</option>
               </select>
+            </div>
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-slate-700 mb-1">Remark</label>
+              <input name="remark" value={formData.remark} onChange={handleChange} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Optional notes" />
             </div>
           </div>
 

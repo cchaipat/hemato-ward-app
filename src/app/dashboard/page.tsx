@@ -1,7 +1,50 @@
-import { KanbanBoard } from "@/components/kanban/KanbanBoard";
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { KanbanBoard, SortOption, FilterState } from "@/components/kanban/KanbanBoard";
 import { BedCapacity } from "@/components/BedCapacity";
+import { FilterSortBar } from "@/components/FilterSortBar";
+import { PatientStatus } from "@/lib/types";
 
 export default function Home() {
+  const [sort, setSort] = useState<SortOption>("waitingTime");
+  const [filter, setFilter] = useState<FilterState>({});
+  const [appliedColumns, setAppliedColumns] = useState<Set<PatientStatus>>(
+    new Set(["waitlist"])
+  );
+
+  // Check if any filter or sort is actively set (not defaults)
+  const isActive =
+    sort !== "waitingTime" ||
+    !!filter.gender ||
+    !!filter.diagnosis ||
+    !!filter.urgency;
+
+  // Auto-check waitlist whenever filter/sort becomes active
+  const handleSortChange = useCallback((newSort: SortOption) => {
+    setSort(newSort);
+    if (newSort !== "waitingTime") {
+      setAppliedColumns((prev) => {
+        const next = new Set(prev);
+        next.add("waitlist");
+        return next;
+      });
+    }
+  }, []);
+
+  const handleFilterChange = useCallback((newFilter: FilterState) => {
+    setFilter(newFilter);
+    const willBeActive =
+      !!newFilter.gender || !!newFilter.diagnosis || !!newFilter.urgency;
+    if (willBeActive) {
+      setAppliedColumns((prev) => {
+        const next = new Set(prev);
+        next.add("waitlist");
+        return next;
+      });
+    }
+  }, []);
+
   return (
     <div className="p-6 max-w-screen-2xl mx-auto space-y-6">
       
@@ -15,9 +58,23 @@ export default function Home() {
         <BedCapacity />
       </div>
 
+      {/* Filter & Sort Bar */}
+      <FilterSortBar
+        sort={sort}
+        onSortChange={handleSortChange}
+        filter={filter}
+        onFilterChange={handleFilterChange}
+        appliedColumns={appliedColumns}
+        onAppliedColumnsChange={setAppliedColumns}
+      />
+
       {/* Main Kanban Board */}
-      <div className="mt-8">
-        <KanbanBoard />
+      <div>
+        <KanbanBoard
+          sort={sort}
+          filter={filter}
+          appliedColumns={appliedColumns}
+        />
       </div>
 
     </div>

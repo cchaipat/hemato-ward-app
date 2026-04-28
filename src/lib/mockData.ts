@@ -33,31 +33,31 @@ export const mockBeds: Bed[] = [
 ];
 
 const createPatient = (
-  id: string, name: string, hn: string, sex: 'Male' | 'Female', diagnosis: string, regimen: string, 
-  isInduction: boolean, cycle: number, expectedCmtDate: string, intention: 'Curative' | 'Palliative' | 'Other', clinician: string,
-  indications: ClinicalIndication[], isUrgent: boolean, status: Patient['status'], assignedBedId?: string | null
+  id: string, name: string, patientTitle: string | undefined, hn: string, sex: 'Male' | 'Female', diagnosis: string, regimen: string, 
+  isInduction: boolean, cycle: number, expectedCmtDate: string, intention: '0 - Exact date' | '1 - Curative' | '2 - Palliative', clinician: string,
+  indications: ClinicalIndication[], isUrgent: boolean, status: Patient['status'], assignedBedId?: string | null, addedAt?: string, remark?: string
 ): Patient => ({
-  id, name, hn, sex, diagnosis, regimen, isInduction, cycle, expectedCmtDate, treatmentIntention: intention, clinician,
+  id, name, patientTitle, hn, sex, diagnosis, regimen, isInduction, cycle, expectedCmtDate, treatmentIntention: intention, clinician,
   clinicalIndications: indications, isUrgent, priorityScore: calculatePriorityScore(indications, isUrgent),
-  status, assignedBedId
+  status, assignedBedId, addedAt: addedAt || '2026-04-28T00:00:00Z', remark
 });
 
 export const mockPatients: Patient[] = [
-  createPatient('p1', 'Somchai Jaidee', 'HN-100234', 'Male', 'Multiple Myeloma', 'VRd', false, 3, '2026-05-10', 'Palliative', 'Dr. A. Smith', ['Relapsed multiple myeloma'], false, 'waitlist'),
-  createPatient('p2', 'Somsri Rakthai', 'HN-100551', 'Female', 'Diffuse Large B-Cell Lymphoma', 'R-CHOP', true, 1, '2026-04-30', 'Curative', 'Dr. B. Jones', ['Aggressive lymphoma'], false, 'waitlist'),
-  createPatient('p3', 'Niran Sookjai', 'HN-101092', 'Male', 'Acute Myeloid Leukemia', '7+3', true, 1, '2026-05-02', 'Curative', 'Dr. A. Smith', ['Other'], true, 'waitlist'), // Urgent!
-  createPatient('p4', 'Kanya Thongkum', 'HN-102948', 'Female', 'Hodgkin Lymphoma', 'ABVD', false, 4, '2026-05-15', 'Curative', 'Dr. C. Davis', ['Hodgkin lymphoma'], false, 'waitlist'),
-  createPatient('p5', 'Vipa Wong', 'HN-109483', 'Female', 'APL', 'ATRA + ATO', true, 1, '2026-05-05', 'Curative', 'Dr. A. Smith', ['Acute promyelocytic leukemia'], false, 'waitlist'),
-  createPatient('p6', 'Polipat P.', 'HN-105382', 'Male', 'Relapsed DLBCL', 'R-ICE', false, 2, '2026-05-01', 'Curative', 'Dr. B. Jones', ['Relapsed aggressive lymphoma eligible for BMT', 'Stem cell mobilization and collection'], false, 'waitlist'),
-  createPatient('p7', 'Wanchai M.', 'HN-107743', 'Male', 'Follicular Lymphoma', 'Clinical Trial Drug X', false, 1, '2026-05-03', 'Palliative', 'Dr. C. Davis', ['Patients enrolled in clinical trials'], false, 'waitlist'),
+  createPatient('p1', 'Somchai Jaidee', 'นาย', 'HN-100234', 'Male', 'MM', '01. 7+3', false, 3, '2026-05-10', '2 - Palliative', 'Dr. A. Smith', ['Relapsed multiple myeloma'], false, 'waitlist', null, '2026-04-20T10:00:00Z', 'Needs special care'),
+  createPatient('p2', 'Somsri Rakthai', 'นาง', 'HN-100551', 'Female', 'NHL', '33. R-ICE', true, 1, '2026-04-30', '1 - Curative', 'Dr. B. Jones', ['Aggressive lymphoma'], false, 'waitlist', null, '2026-04-22T09:30:00Z'),
+  createPatient('p3', 'Niran Sookjai', 'นาย', 'HN-101092', 'Male', 'AML', '01. 7+3', true, 1, '2026-05-02', '1 - Curative', 'Dr. A. Smith', ['Other'], true, 'waitlist', null, '2026-04-25T14:15:00Z'), // Urgent!
+  createPatient('p4', 'Kanya Thongkum', 'น.ส.', 'HN-102948', 'Female', 'HL', '23. Escalated BEACOPDac', false, 4, '2026-05-15', '1 - Curative', 'Dr. C. Davis', ['Hodgkin lymphoma'], false, 'waitlist', null, '2026-04-18T11:20:00Z'),
+  createPatient('p5', 'Vipa Wong', 'นาง', 'HN-109483', 'Female', 'APL', '11. ATO + ATRA induction', true, 1, '2026-05-05', '1 - Curative', 'Dr. A. Smith', ['Acute promyelocytic leukemia'], false, 'waitlist', null, '2026-04-27T08:45:00Z'),
+  createPatient('p6', 'Polipat P.', 'นาย', 'HN-105382', 'Male', 'NHL', '33. R-ICE', false, 2, '2026-05-01', '1 - Curative', 'Dr. B. Jones', ['Relapsed aggressive lymphoma eligible for BMT', 'Stem cell mobilization and collection'], false, 'waitlist', null, '2026-04-26T16:00:00Z'),
+  createPatient('p7', 'Wanchai M.', 'นาย', 'HN-107743', 'Male', 'NHL', 'อื่นๆ', false, 1, '2026-05-03', '2 - Palliative', 'Dr. C. Davis', ['Patients enrolled in clinical trials'], false, 'waitlist', null, '2026-04-21T13:10:00Z'),
   
   // Already admitted patients
-  createPatient('p8', 'Manee R.', 'HN-108832', 'Female', 'AML', 'HiDAC', false, 2, '2026-04-10', 'Curative', 'Dr. A. Smith', ['Other'], false, 'admitted', 'bed-10'),
-  createPatient('p9', 'Prasert T.', 'HN-104443', 'Male', 'Multiple Myeloma', 'D-VTd', true, 1, '2026-04-12', 'Curative', 'Dr. C. Davis', ['Other'], false, 'admitted', 'bed-1'),
+  createPatient('p8', 'Manee R.', 'นาง', 'HN-108832', 'Female', 'AML', '02. HiDAC', false, 2, '2026-04-10', '1 - Curative', 'Dr. A. Smith', ['Other'], false, 'admitted', 'bed-10'),
+  createPatient('p9', 'Prasert T.', 'นาย', 'HN-104443', 'Male', 'MM', '22. DCEP', true, 1, '2026-04-12', '1 - Curative', 'Dr. C. Davis', ['Other'], false, 'admitted', 'bed-1'),
   
   // Ready for discharge
-  createPatient('p10', 'Anong N.', 'HN-100010', 'Female', 'DLBCL', 'R-CHOP', false, 6, '2026-04-01', 'Curative', 'Dr. B. Jones', ['Aggressive lymphoma'], false, 'ready_for_discharge', 'bed-2'),
+  createPatient('p10', 'Anong N.', 'นาง', 'HN-100010', 'Female', 'NHL', '33. R-ICE', false, 6, '2026-04-01', '1 - Curative', 'Dr. B. Jones', ['Aggressive lymphoma'], false, 'ready_for_discharge', 'bed-2'),
   
   // Discharged historical
-  createPatient('p11', 'Kasem J.', 'HN-101111', 'Male', 'ALL', 'HyperCVAD', true, 1, '2026-03-25', 'Curative', 'Dr. A. Smith', ['Other'], false, 'discharged', null),
+  createPatient('p11', 'Kasem J.', 'นาย', 'HN-101111', 'Male', 'ALL', '53. Hyper CVAD (course 1,3,5,7)', true, 1, '2026-03-25', '1 - Curative', 'Dr. A. Smith', ['Other'], false, 'discharged', null),
 ];

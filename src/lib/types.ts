@@ -26,14 +26,16 @@ export interface Patient {
   id: string;
   hn: string;
   name: string;
+  patientTitle?: string;
   sex: 'Male' | 'Female';
   diagnosis: string;
   regimen: string;
   isInduction: boolean;
   cycle: number;
   expectedCmtDate?: string;
-  treatmentIntention: 'Curative' | 'Palliative' | 'Other';
+  treatmentIntention: '0 - Exact date' | '1 - Curative' | '2 - Palliative';
   clinician: string;
+  remark?: string;
   status: PatientStatus;
   
   // Priority System
@@ -43,6 +45,9 @@ export interface Patient {
   
   // Assignment
   assignedBedId?: string | null; 
+  
+  // Timestamps
+  addedAt?: string; // ISO date string
 }
 
 export type UserRole = 'editor' | 'viewer';
