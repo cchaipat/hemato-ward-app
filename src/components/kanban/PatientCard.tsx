@@ -1,9 +1,9 @@
 "use client";
 
 import { Draggable } from "@hello-pangea/dnd";
-import { Patient } from "@/lib/types";
+import { Patient, PatientStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { AlertCircle, Calendar, BedDouble, User, Pencil } from "lucide-react";
+import { AlertCircle, Calendar, BedDouble, User, Pencil, ChevronRight, ChevronLeft } from "lucide-react";
 import { format } from "date-fns";
 import { useAppStore } from "@/lib/store";
 
@@ -13,9 +13,10 @@ interface PatientCardProps {
   isDragDisabled: boolean;
   onEdit?: (patient: Patient) => void;
   onReassignBed?: (patient: Patient) => void;
+  onMove?: (patient: Patient, newStatus: PatientStatus) => void;
 }
 
-export function PatientCard({ patient, index, isDragDisabled, onEdit, onReassignBed }: PatientCardProps) {
+export function PatientCard({ patient, index, isDragDisabled, onEdit, onReassignBed, onMove }: PatientCardProps) {
   const isWaitlist = patient.status === 'waitlist';
   const beds = useAppStore(state => state.beds);
   
@@ -115,7 +116,38 @@ export function PatientCard({ patient, index, isDragDisabled, onEdit, onReassign
                  <BedDouble className="h-3.5 w-3.5" />
                  <span>{bedName}</span>
                </div>
-             ) : null}
+             ) : <div />}
+
+             {!isDragDisabled && onMove && (
+               <div className="flex items-center gap-1">
+                 <button 
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     const order: PatientStatus[] = ['waitlist', 'admitted', 'ready_for_discharge', 'discharged'];
+                     const idx = order.indexOf(patient.status);
+                     if (idx > 0) onMove(patient, order[idx - 1]);
+                   }}
+                   disabled={patient.status === 'waitlist'}
+                   className="p-1 rounded bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                   title="Move to previous stage"
+                 >
+                   <ChevronLeft className="h-4 w-4" />
+                 </button>
+                 <button 
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     const order: PatientStatus[] = ['waitlist', 'admitted', 'ready_for_discharge', 'discharged'];
+                     const idx = order.indexOf(patient.status);
+                     if (idx < order.length - 1) onMove(patient, order[idx + 1]);
+                   }}
+                   disabled={patient.status === 'discharged'}
+                   className="p-1 rounded bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                   title="Move to next stage"
+                 >
+                   <ChevronRight className="h-4 w-4" />
+                 </button>
+               </div>
+             )}
           </div>
         </div>
       )}

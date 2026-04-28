@@ -113,6 +113,14 @@ export function KanbanBoard() {
                             setPendingMove({ patientId: p.id, destinationStatus: p.status });
                             setModalOpen(true);
                           }}
+                          onMove={(p, newStatus) => {
+                            if (newStatus === 'admitted' && p.status !== 'ready_for_discharge') {
+                              setPendingMove({ patientId: p.id, destinationStatus: newStatus });
+                              setModalOpen(true);
+                            } else {
+                              movePatient(p.id, newStatus);
+                            }
+                          }}
                         />
                       ))}
                       {provided.placeholder}
