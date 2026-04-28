@@ -146,7 +146,11 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'hemato-app-storage',
-      partialize: (state) => ({ userRole: state.userRole }), // Only persist auth state, keep mock data fresh
+      partialize: (state) => ({ 
+        userRole: state.userRole,
+        patients: state.patients,
+        beds: state.beds
+      }), // Persist auth state AND all changes to mock data
     }
   )
 );

@@ -5,6 +5,7 @@ import { Patient } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { AlertCircle, Calendar, BedDouble, User, Pencil } from "lucide-react";
 import { format } from "date-fns";
+import { useAppStore } from "@/lib/store";
 
 interface PatientCardProps {
   patient: Patient;
@@ -15,7 +16,11 @@ interface PatientCardProps {
 
 export function PatientCard({ patient, index, isDragDisabled, onEdit }: PatientCardProps) {
   const isWaitlist = patient.status === 'waitlist';
+  const beds = useAppStore(state => state.beds);
   
+  const assignedBed = patient.assignedBedId ? beds.find(b => b.id === patient.assignedBedId) : null;
+  const bedName = assignedBed ? assignedBed.name : 'Unknown Bed';
+
   return (
     <Draggable draggableId={patient.id} index={index} isDragDisabled={isDragDisabled}>
       {(provided, snapshot) => (
@@ -95,9 +100,7 @@ export function PatientCard({ patient, index, isDragDisabled, onEdit }: PatientC
              ) : patient.assignedBedId ? (
                <div className="flex items-center gap-1 font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
                  <BedDouble className="h-3.5 w-3.5" />
-                 <span>Bed Assigned</span>
-                 {/* Note: We would ideally join the string "VIP-1" here but we have the ID only in patient. 
-                     We can lookup in the KanbanBoard or pass it in via props later if needed */}
+                 <span>{bedName}</span>
                </div>
              ) : null}
           </div>
