@@ -109,6 +109,10 @@ export function KanbanBoard() {
                           index={index} 
                           isDragDisabled={isDragDisabled} 
                           onEdit={setEditingPatient}
+                          onReassignBed={(p) => {
+                            setPendingMove({ patientId: p.id, destinationStatus: p.status });
+                            setModalOpen(true);
+                          }}
                         />
                       ))}
                       {provided.placeholder}

@@ -12,9 +12,10 @@ interface PatientCardProps {
   index: number;
   isDragDisabled: boolean;
   onEdit?: (patient: Patient) => void;
+  onReassignBed?: (patient: Patient) => void;
 }
 
-export function PatientCard({ patient, index, isDragDisabled, onEdit }: PatientCardProps) {
+export function PatientCard({ patient, index, isDragDisabled, onEdit, onReassignBed }: PatientCardProps) {
   const isWaitlist = patient.status === 'waitlist';
   const beds = useAppStore(state => state.beds);
   
@@ -98,7 +99,19 @@ export function PatientCard({ patient, index, isDragDisabled, onEdit }: PatientC
                  <span>{format(new Date(patient.expectedCmtDate), 'MMM d, yyyy')}</span>
                </div>
              ) : patient.assignedBedId ? (
-               <div className="flex items-center gap-1 font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+               <div 
+                 onClick={(e) => { 
+                   if (!isDragDisabled && onReassignBed) {
+                     e.stopPropagation(); 
+                     onReassignBed(patient); 
+                   }
+                 }}
+                 className={cn(
+                   "flex items-center gap-1 font-medium px-2 py-0.5 rounded",
+                   !isDragDisabled && onReassignBed ? "text-blue-700 bg-blue-100 hover:bg-blue-200 cursor-pointer transition-colors" : "text-blue-600 bg-blue-50"
+                 )}
+                 title={!isDragDisabled ? "Click to reassign bed" : undefined}
+               >
                  <BedDouble className="h-3.5 w-3.5" />
                  <span>{bedName}</span>
                </div>
