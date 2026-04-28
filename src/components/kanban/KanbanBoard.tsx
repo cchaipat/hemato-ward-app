@@ -35,14 +35,19 @@ export function KanbanBoard() {
     if (!result.destination) return;
     
     const patientId = result.draggableId;
+    const patientObj = patients.find(p => p.id === patientId);
     const sourceStatus = result.source.droppableId as PatientStatus;
     const destinationStatus = result.destination.droppableId as PatientStatus;
 
-    if (sourceStatus === destinationStatus) return;
+    if (!patientObj || sourceStatus === destinationStatus) return;
 
-    // Special case: Dropping into Admitted column
-    if (destinationStatus === 'admitted' && sourceStatus !== 'ready_for_discharge') {
-      // Need bed assignment
+    // Prevent direct move from waitlist to ready_for_discharge or discharged
+    if (sourceStatus === 'waitlist' && (destinationStatus === 'ready_for_discharge' || destinationStatus === 'discharged')) {
+      return; 
+    }
+
+    // Modal case: Dropping into Admitted column and they don't currently have a bed
+    if (destinationStatus === 'admitted' && !patientObj.assignedBedId) {
       setPendingMove({ patientId, destinationStatus });
       setModalOpen(true);
       return;
