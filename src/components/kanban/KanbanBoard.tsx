@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import { useAppStore } from "@/lib/store";
-import { PatientStatus, Bed } from "@/lib/types";
+import { PatientStatus, Bed, Patient } from "@/lib/types";
 import { PatientCard } from "./PatientCard";
 import { BedAssignmentModal } from "./BedAssignmentModal";
 import { AddPatientModal } from "./AddPatientModal";
