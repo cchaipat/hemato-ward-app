@@ -74,11 +74,11 @@ export function KanbanBoard() {
   return (
     <>
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 h-[calc(100vh-230px)]">
+        <div className="flex overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 h-[calc(100vh-230px)] snap-x snap-mandatory pb-4 md:pb-0">
           {COLUMNS.map((column) => {
             const columnPatients = getSortedPatients(column.id);
             return (
-              <div key={column.id} className="flex flex-col h-full">
+              <div key={column.id} className="flex flex-col h-full min-w-[85vw] md:min-w-0 snap-center">
                 <div className="flex items-center justify-between mb-3 px-1">
                   <h2 className="font-semibold text-slate-700">{column.title}</h2>
                   <div className="flex items-center gap-2">
