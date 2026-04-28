@@ -7,6 +7,7 @@ import { PatientStatus, Bed } from "@/lib/types";
 import { PatientCard } from "./PatientCard";
 import { BedAssignmentModal } from "./BedAssignmentModal";
 import { AddPatientModal } from "./AddPatientModal";
+import { EditPatientModal } from "./EditPatientModal";
 import { Plus } from "lucide-react";
 
 const COLUMNS: { id: PatientStatus; title: string; color: string }[] = [
@@ -23,6 +24,7 @@ export function KanbanBoard() {
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [pendingMove, setPendingMove] = useState<{ patientId: string; destinationStatus: PatientStatus } | null>(null);
 
   useEffect(() => {
@@ -106,6 +108,7 @@ export function KanbanBoard() {
                           patient={patient} 
                           index={index} 
                           isDragDisabled={isDragDisabled} 
+                          onEdit={setEditingPatient}
                         />
                       ))}
                       {provided.placeholder}
@@ -131,6 +134,10 @@ export function KanbanBoard() {
 
       {addModalOpen && (
         <AddPatientModal onClose={() => setAddModalOpen(false)} />
+      )}
+
+      {editingPatient && (
+        <EditPatientModal patient={editingPatient} onClose={() => setEditingPatient(null)} />
       )}
     </>
   );

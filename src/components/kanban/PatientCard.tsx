@@ -3,16 +3,17 @@
 import { Draggable } from "@hello-pangea/dnd";
 import { Patient } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { AlertCircle, Calendar, BedDouble, User } from "lucide-react";
+import { AlertCircle, Calendar, BedDouble, User, Pencil } from "lucide-react";
 import { format } from "date-fns";
 
 interface PatientCardProps {
   patient: Patient;
   index: number;
   isDragDisabled: boolean;
+  onEdit?: (patient: Patient) => void;
 }
 
-export function PatientCard({ patient, index, isDragDisabled }: PatientCardProps) {
+export function PatientCard({ patient, index, isDragDisabled, onEdit }: PatientCardProps) {
   const isWaitlist = patient.status === 'waitlist';
   
   return (
@@ -39,16 +40,28 @@ export function PatientCard({ patient, index, isDragDisabled }: PatientCardProps
               <p className="text-xs text-slate-500 font-medium">HN: {patient.hn} • {patient.sex}</p>
             </div>
             
-            {isWaitlist && patient.priorityScore > 0 && (
-              <div className={cn(
-                "px-2 py-0.5 rounded text-xs font-bold",
-                patient.isUrgent || patient.priorityScore >= 8 ? "bg-red-100 text-red-700" :
-                patient.priorityScore >= 5 ? "bg-orange-100 text-orange-700" :
-                "bg-blue-100 text-blue-700"
-              )}>
-                P-{patient.priorityScore}
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              {isWaitlist && patient.priorityScore > 0 && (
+                <div className={cn(
+                  "px-2 py-0.5 rounded text-xs font-bold",
+                  patient.isUrgent || patient.priorityScore >= 8 ? "bg-red-100 text-red-700" :
+                  patient.priorityScore >= 5 ? "bg-orange-100 text-orange-700" :
+                  "bg-blue-100 text-blue-700"
+                )}>
+                  P-{patient.priorityScore}
+                </div>
+              )}
+              
+              {!isDragDisabled && onEdit && (
+                <button 
+                  onClick={(e) => { e.stopPropagation(); onEdit(patient); }}
+                  className="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                  title="Edit Patient"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Clinical Info */}

@@ -18,6 +18,7 @@ interface AppState {
   movePatient: (patientId: string, newStatus: PatientStatus, newBedId?: string | null) => void;
   updateBedOccupancy: () => void;
   addPatient: (patientData: Omit<Patient, "id" | "status" | "priorityScore">) => void;
+  updatePatient: (id: string, patientData: Partial<Patient>) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -110,6 +111,35 @@ export const useAppStore = create<AppState>()(
       return {
         ...state,
         patients: [...state.patients, newPatient]
+      };
+    });
+  },
+
+  updatePatient: (id, updateData) => {
+    set((state) => {
+      const patientIndex = state.patients.findIndex(p => p.id === id);
+      if (patientIndex === -1) return state;
+
+      const patient = state.patients[patientIndex];
+      
+      let newPriorityScore = patient.priorityScore;
+      // Recalculate priority if indications or urgency changed
+      if (updateData.clinicalIndications !== undefined || updateData.isUrgent !== undefined) {
+        const indications = updateData.clinicalIndications || patient.clinicalIndications;
+        const isUrgent = updateData.isUrgent !== undefined ? updateData.isUrgent : patient.isUrgent;
+        newPriorityScore = calculatePriorityScore(indications, isUrgent);
+      }
+
+      const updatedPatients = [...state.patients];
+      updatedPatients[patientIndex] = {
+        ...patient,
+        ...updateData,
+        priorityScore: newPriorityScore,
+      };
+
+      return {
+        ...state,
+        patients: updatedPatients
       };
     });
   }
