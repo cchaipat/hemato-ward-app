@@ -14,19 +14,19 @@ export function Navbar() {
   };
 
   return (
-    <nav className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm">
+    <nav className="bg-white border-b border-slate-200 px-4 md:px-6 py-3 md:py-4 flex items-center justify-between shadow-sm">
       <div className="flex items-center space-x-3">
         <div className="bg-blue-600 p-2 rounded-lg">
           <Activity className="h-5 w-5 text-white" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">HematoWard<span className="text-blue-600">Pro</span></h1>
-          <p className="text-xs text-slate-500 font-medium">Hematology Bed Management System</p>
+          <p className="hidden md:block text-xs text-slate-500 font-medium">Hematology Bed Management System</p>
         </div>
       </div>
 
-      <div className="flex items-center space-x-4">
-        <div className="flex items-center bg-slate-100 rounded-full py-1.5 px-4 border border-slate-200 md:min-w-48 justify-between">
+      <div className="flex items-center space-x-2 md:space-x-4">
+        <div className="flex items-center bg-slate-100 rounded-full py-1.5 px-3 md:px-4 border border-slate-200 md:min-w-48 justify-between">
           
           <div className="flex items-center space-x-2 text-sm font-bold text-slate-700">
             {userRole === 'editor' ? (

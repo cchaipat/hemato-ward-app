@@ -16,10 +16,10 @@ export function BedCapacity() {
   const isoAvailable = beds.filter(b => b.type === 'Isolation' && !b.isOccupied).length;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5 w-full flex flex-col md:flex-row items-center gap-6">
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-5 w-full flex flex-col md:flex-row items-center gap-4 md:gap-6">
       
       {/* Primary Stat */}
-      <div className="flex items-center gap-4 pr-6 border-r border-slate-200">
+      <div className="flex items-center justify-center w-full md:w-auto gap-4 pb-4 md:pb-0 md:pr-6 border-b md:border-b-0 md:border-r border-slate-200">
         <div className={`p-3 rounded-xl ${availableBeds > 0 ? 'bg-blue-50 text-blue-600' : 'bg-red-50 text-red-600'}`}>
           <BedDouble className="h-6 w-6" />
         </div>
@@ -32,7 +32,7 @@ export function BedCapacity() {
       </div>
 
       {/* Secondary Stats */}
-      <div className="flex flex-1 items-center gap-6 overflow-x-auto whitespace-nowrap">
+      <div className="flex flex-1 w-full md:w-auto items-center gap-6 overflow-x-auto whitespace-nowrap pb-2 md:pb-0 scrollbar-hide">
         <StatItem label="Intensive (HEPA)" count={hepaAvailable} total={beds.filter(b => b.type === 'Intensive CMT (HEPA)').length} />
         <StatItem label="General CMT" count={genAvailable} total={beds.filter(b => b.type === 'General CMT').length} />
         <StatItem label="VIP Room" count={vipAvailable} total={beds.filter(b => b.type === 'VIP').length} />
